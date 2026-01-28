@@ -100,8 +100,8 @@
         html.pwa-standalone .admin-header { padding-top:calc(8px + var(--safe-top)) !important; }
         html.pwa-standalone .admin-page .admin-container { padding-top:calc(40px + var(--safe-top)) !important; }
         @media (min-width:601px) {
-            html.pwa-standalone .att-container { padding-top:calc(85px + var(--safe-top)) !important; }
-            html.pwa-standalone .admin-page .admin-container { padding-top:calc(85px + var(--safe-top)) !important; }
+            html.pwa-standalone .att-container { padding-top:calc(80px + var(--safe-top)) !important; }
+            html.pwa-standalone .admin-page .admin-container { padding-top:calc(75px + var(--safe-top)) !important; }
         }
         .att-logo { display:flex; align-items:center; gap:12px; }
         .att-logo .icon { width:46px; height:46px; background:linear-gradient(135deg,var(--accent-blue-bg) 0%,var(--accent-purple-bg) 100%); border-radius:var(--radius-md); display:flex; align-items:center; justify-content:center; border:1px solid var(--border); box-shadow:var(--shadow-sm); }
@@ -764,7 +764,7 @@
     <canvas id="captureCanvas" style="display:none"></canvas>
 
     <script>
-        const API_URL='https://script.google.com/macros/s/AKfycbyYxW57e0Ev_kPMxdXMlWURSlSHmXZ9PDrrBvtX8GmmB3hAxrwZfifXToNid6T6kakR/exec';
+        const API_URL='https://script.google.com/macros/s/AKfycbwZaTHIH_0qq7TnkJ379jqvLzB2bobwb-2xlTV3SjKm-l88kjpMzZOQ5KJfU6L76koE/exec';
         const FIREBASE_URL='https://employee-attendance-89b36-default-rtdb.asia-southeast1.firebasedatabase.app';
         const FACE_MATCH_THRESHOLD=0.5;
         const ITEMS_PER_PAGE=15;
@@ -839,7 +839,7 @@
         
         function formatTimeForExcel(rawTime){if(!rawTime||rawTime==='-')return'-';if(typeof rawTime==='string'){if(/^\d{1,2}:\d{2}(:\d{2})?$/.test(rawTime))return rawTime;if(rawTime.includes('GMT')||rawTime.includes('T')){try{const d=new Date(rawTime);if(!isNaN(d.getTime())){const h=String(d.getHours()).padStart(2,'0');const m=String(d.getMinutes()).padStart(2,'0');const s=String(d.getSeconds()).padStart(2,'0');return h+':'+m+':'+s;}}catch(e){return String(rawTime);}}}if(rawTime instanceof Date){const h=String(rawTime.getHours()).padStart(2,'0');const m=String(rawTime.getMinutes()).padStart(2,'0');const s=String(rawTime.getSeconds()).padStart(2,'0');return h+':'+m+':'+s;}return String(rawTime);}
         
-        async function exportToExcel(){const startDate=document.getElementById('exportStartDate').value;const endDate=document.getElementById('exportEndDate').value;if(!startDate||!endDate){showResult('error','ไม่สำเร็จ','กรุณาเลือกช่วงวันที่');return;}if(new Date(startDate)>new Date(endDate)){showResult('error','ไม่สำเร็จ','วันที่เริ่มต้นต้องไม่เกินวันที่สิ้นสุด');return;}const btn=document.getElementById('btnDoExport');const orig=btn.innerHTML;btn.innerHTML=spinnerSVG+' กำลังโหลด...';btn.disabled=true;try{const startDateThai=formatDateThai(startDate);const endDateThai=formatDateThai(endDate);const response=await callAPI({action:'getAttendanceRange',startDate:startDateThai,endDate:endDateThai});if(response.status!=='success'){showResult('error','ไม่สำเร็จ','ไม่สามารถโหลดข้อมูลได้');return;}if(!response.data||response.data.length===0){showResult('warning','ไม่พบข้อมูล','ไม่มีข้อมูลการลงเวลาในช่วงวันที่ที่เลือก');return;}const allData=response.data.map(r=>({'วันที่':r.date,'รหัสพนักงาน':r.employeeId,'ชื่อ-สกุล':r.employeeName,'ประเภท':r.type,'ผลัด':r.shift||'-','เวลา':formatTimeForExcel(r.time),'สถานะ':r.status||'ปกติ','สายกี่นาที':r.lateMinutes||0}));const ws=XLSX.utils.json_to_sheet(allData);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'ข้อมูลการลงเวลา');ws['!cols']=[{wch:12},{wch:12},{wch:25},{wch:10},{wch:12},{wch:10},{wch:10},{wch:10}];const fileName='attendance_'+startDate+'_to_'+endDate+'.xlsx';XLSX.writeFile(wb,fileName);closeExportModal();showResult('success','สำเร็จ','ดาวน์โหลดไฟล์ '+fileName+' เรียบร้อย');}catch(error){console.error('Export error:',error);showResult('error','ไม่สำเร็จ','เกิดข้อผิดพลาดในการสร้างไฟล์');}finally{btn.innerHTML=orig;btn.disabled=false;lucide.createIcons();}}
+        async function exportToExcel(){const startDate=document.getElementById('exportStartDate').value;const endDate=document.getElementById('exportEndDate').value;if(!startDate||!endDate){showResult('error','ไม่สำเร็จ','กรุณาเลือกช่วงวันที่');return;}if(new Date(startDate)>new Date(endDate)){showResult('error','ไม่สำเร็จ','วันที่เริ่มต้นต้องไม่เกินวันที่สิ้นสุด');return;}const btn=document.getElementById('btnDoExport');const orig=btn.innerHTML;btn.innerHTML=spinnerSVG+' กำลังโหลด...';btn.disabled=true;try{const startDateThai=formatDateThai(startDate);const endDateThai=formatDateThai(endDate);const response=await callAPI({action:'getAttendanceRange',startDate:startDateThai,endDate:endDateThai});if(response.status!=='success'){showResult('error','ไม่สำเร็จ','ไม่สามารถโหลดข้อมูลได้');return;}if(!response.data||response.data.length===0){showResult('warning','ไม่พบข้อมูล','ไม่มีข้อมูลการลงเวลาในช่วงวันที่ที่เลือก');return;}const allData=response.data.map(r=>({'วันที่':r.date,'รหัสพนักงาน':r.employeeId,'ชื่อ-สกุล':r.employeeName,'ตำแหน่ง':r.position||'-','กลุ่ม':r.group||'-','ประเภท':r.type,'ผลัด':r.shift||'-','เวลา':formatTimeForExcel(r.time),'สถานะ':r.status||'ปกติ','สายกี่นาที':r.lateMinutes||0}));const ws=XLSX.utils.json_to_sheet(allData);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'ข้อมูลการลงเวลา');ws['!cols']=[{wch:12},{wch:12},{wch:25},{wch:15},{wch:12},{wch:10},{wch:12},{wch:10},{wch:10},{wch:10}];const fileName='attendance_'+startDate+'_to_'+endDate+'.xlsx';XLSX.writeFile(wb,fileName);closeExportModal();showResult('success','สำเร็จ','ดาวน์โหลดไฟล์ '+fileName+' เรียบร้อย');}catch(error){console.error('Export error:',error);showResult('error','ไม่สำเร็จ','เกิดข้อผิดพลาดในการสร้างไฟล์');}finally{btn.innerHTML=orig;btn.disabled=false;lucide.createIcons();}}
         function formatDateThai(dateStr){const[y,m,d]=dateStr.split('-');return d+'/'+m+'/'+y;}
 
         function populateRegSelect(){const s=document.getElementById('regEmployeeSelect');s.innerHTML='<option value="">-- เลือกพนักงาน --</option>';allEmployees.forEach(e=>{const o=document.createElement('option');o.value=e.id;o.textContent=e.id+' - '+(e.fullName||e.name)+(e.hasFaceData?' (ลงทะเบียนแล้ว)':'');s.appendChild(o);});}
@@ -963,10 +963,13 @@
         // Edit Log
         let editLogRecords=[],allEditLogRecords=[],editLogPage=1;
         async function loadEditLogs(){
+            const tbody=document.getElementById('editLogTableBody');
+            tbody.innerHTML='<tr><td colspan="5" class="empty-state"><div class="loader-ring" style="width:32px;height:32px;margin:0 auto 12px"></div><p>กำลังโหลดข้อมูล...</p></td></tr>';
+            document.getElementById('editLogPagination').innerHTML='';
             try{
                 const r=await callAPI({action:'getEditLogs'});
                 if(r.status==='success'){allEditLogRecords=r.data||[];editLogRecords=[...allEditLogRecords];editLogPage=1;renderEditLogTable();}
-            }catch(e){console.error(e);}
+            }catch(e){console.error(e);tbody.innerHTML='<tr><td colspan="5" class="empty-state"><i data-lucide="alert-circle"></i><p>โหลดข้อมูลไม่สำเร็จ</p></td></tr>';lucide.createIcons();}
         }
         function renderEditLogTable(){
             const tbody=document.getElementById('editLogTableBody');
@@ -994,10 +997,13 @@
         // Users Management
         let usersRecords=[],allUsersRecords=[],usersPage=1;
         async function loadUsers(){
+            const tbody=document.getElementById('usersTableBody');
+            tbody.innerHTML='<tr><td colspan="4" class="empty-state"><div class="loader-ring" style="width:32px;height:32px;margin:0 auto 12px"></div><p>กำลังโหลดข้อมูล...</p></td></tr>';
+            document.getElementById('usersPagination').innerHTML='';
             try{
                 const r=await callAPI({action:'getUsers'});
                 if(r.status==='success'){allUsersRecords=r.data||[];usersRecords=[...allUsersRecords];usersPage=1;renderUsersTable();}
-            }catch(e){console.error(e);}
+            }catch(e){console.error(e);tbody.innerHTML='<tr><td colspan="4" class="empty-state"><i data-lucide="alert-circle"></i><p>โหลดข้อมูลไม่สำเร็จ</p></td></tr>';lucide.createIcons();}
         }
         function renderUsersTable(){
             const tbody=document.getElementById('usersTableBody');
@@ -1037,7 +1043,7 @@
             }catch(e){console.error('Camera switch error:',e);showResult('error','ไม่สำเร็จ','ไม่สามารถสลับกล้องได้');}
         }
 
-        function showPage(id,save=true){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');if(save)localStorage.setItem('currentPage',id);if(id==='pageDashboard'){setToday();}else if(id==='pageEditLog'){loadEditLogs();}else if(id==='pageUsers'){loadUsers();}else if(id==='pageAdmin'){renderEmpTable();}else{stopAutoRefresh();}if(id!=='pageAdmin')stopRegCam();updateSidebarActive(id);lucide.createIcons();}
+        function showPage(id,save=true){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');if(save)localStorage.setItem('currentPage',id);if(id==='pageDashboard'){setToday();}else if(id==='pageEditLog'){loadEditLogs();stopAutoRefresh();}else if(id==='pageUsers'){loadUsers();stopAutoRefresh();}else if(id==='pageAdmin'){renderEmpTable();startAutoRefresh();}else{stopAutoRefresh();}if(id!=='pageAdmin')stopRegCam();updateSidebarActive(id);lucide.createIcons();}
 
         function showAddEmployeeModal(){document.getElementById('addEmployeeModal').classList.add('active');document.getElementById('customTitleGroup').classList.add('hidden');document.getElementById('customTitle').value='';document.getElementById('newEmpTitle').value='';loadNextId();lucide.createIcons();}
         function closeAddEmployeeModal(){document.getElementById('addEmployeeModal').classList.remove('active');}
@@ -1059,7 +1065,7 @@
         function setToday(){const t=new Date();const dateStr=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');document.getElementById('dashboardDate').value=dateStr;userSelectedDate=dateStr;loadDashboard();startAutoRefresh();}
         
         let dashboardRefreshInterval=null;
-        function startAutoRefresh(){if(dashboardRefreshInterval)clearInterval(dashboardRefreshInterval);dashboardRefreshInterval=setInterval(()=>{const currentPageEl=document.querySelector('.page.active');if(currentPageEl&&currentPageEl.id==='pageDashboard'){loadDashboard();}},5*60*1000);}
+        function startAutoRefresh(){if(dashboardRefreshInterval)clearInterval(dashboardRefreshInterval);dashboardRefreshInterval=setInterval(()=>{const currentPageEl=document.querySelector('.page.active');if(currentPageEl){if(currentPageEl.id==='pageDashboard')loadDashboard();else if(currentPageEl.id==='pageAdmin')loadEmployees();}},5*60*1000);}
         function stopAutoRefresh(){if(dashboardRefreshInterval){clearInterval(dashboardRefreshInterval);dashboardRefreshInterval=null;}}
         function updateLastUpdateTime(){const now=new Date();const timeStr=now.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'});const el=document.getElementById('lastUpdateTime');if(el)el.textContent=timeStr;}
         
