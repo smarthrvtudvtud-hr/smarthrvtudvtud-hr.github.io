@@ -764,11 +764,11 @@
     <canvas id="captureCanvas" style="display:none"></canvas>
 
     <script>
-        const API_URL='https://script.google.com/macros/s/AKfycbwZaTHIH_0qq7TnkJ379jqvLzB2bobwb-2xlTV3SjKm-l88kjpMzZOQ5KJfU6L76koE/exec';
+        const API_URL='https://script.google.com/macros/s/AKfycbz8AFRV3FjB0OQ7LJqq0jRmRep_YG4Zdm-JmTLXSaPFnx-msci5YFyalv44vFofPCia/exec';
         const FIREBASE_URL='https://employee-attendance-89b36-default-rtdb.asia-southeast1.firebasedatabase.app';
         const FACE_MATCH_THRESHOLD=0.5;
         const ITEMS_PER_PAGE=15;
-        const WORK_AREAS=[[{lat:17.3861777,lng:102.7767161},{lat:17.3872041,lng:102.7746373},{lat:17.3875573,lng:102.7748224},{lat:17.3865079,lng:102.7768904}],[{lat:17.3848262,lng:102.7795136},{lat:17.3846239,lng:102.7793580},{lat:17.3845574,lng:102.7794948},{lat:17.3847878,lng:102.7796370}]];
+        const WORK_AREAS=[[{lat:17.3861777,lng:102.7767161},{lat:17.3871913,lng:102.7746266},{lat:17.3875573,lng:102.7748224},{lat:17.3865360,lng:102.7769172}],[{lat:17.3848262,lng:102.7795136},{lat:17.3846239,lng:102.7793580},{lat:17.3845574,lng:102.7794948},{lat:17.3847878,lng:102.7796370}]];
 
         let currentUser=null,currentLocation=null,videoStream=null,employees=[],allEmployees=[];
         let matchedEmployee=null,faceDescriptor=null,isDetecting=false,detectionInterval=null,selectedShift=null;
