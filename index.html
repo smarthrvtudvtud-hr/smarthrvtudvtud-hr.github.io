@@ -765,7 +765,8 @@
     <canvas id="captureCanvas" style="display:none"></canvas>
 
     <script>
-        const API_URL='https://script.google.com/macros/s/AKfycbxD4M7Ly33ZoDwMgUL9IT-3h-NzFDd0_O-8cyzBoWPTuOOuEKanI81ObfElkybiKaeZ/exec';
+        const API_URL='https://script.google.com/macros/s/AKfycbwNG8COsKea0y7dlZsCoeKd_zHdP5qsZOF1N2W93WEahCp3rZEjjHL6zfhRRUEYb_N0/exec';
+        const API_KEY='ATT-2024-xK9mP3nQ7vL2wR5y';
         const FIREBASE_URL='https://employee-attendance-89b36-default-rtdb.asia-southeast1.firebasedatabase.app';
         const FACE_MATCH_THRESHOLD=0.5;
         const ITEMS_PER_PAGE=15;
@@ -816,7 +817,7 @@
 
         async function loadFaceAPI(){const URL='https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.12/model';try{document.getElementById('loadingText').textContent='โหลด Face Detection...';document.getElementById('loadingProgress').style.width='25%';await faceapi.nets.tinyFaceDetector.loadFromUri(URL);document.getElementById('loadingText').textContent='โหลด Landmarks...';document.getElementById('loadingProgress').style.width='50%';await faceapi.nets.faceLandmark68Net.loadFromUri(URL);document.getElementById('loadingText').textContent='โหลด Recognition...';document.getElementById('loadingProgress').style.width='75%';await faceapi.nets.faceRecognitionNet.loadFromUri(URL);document.getElementById('loadingText').textContent='พร้อมใช้งาน!';document.getElementById('loadingProgress').style.width='100%';setTimeout(()=>document.getElementById('loadingOverlay').classList.add('hidden'),500);}catch(e){document.getElementById('loadingText').textContent='โหลดไม่สำเร็จ';}}
 
-        async function callAPI(data){const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(data)});return r.json();}
+        async function callAPI(data){data.apiKey=API_KEY;data.origin=window.location.origin;const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(data)});return r.json();}
         function capturePhoto(v){const c=document.getElementById('captureCanvas'),ctx=c.getContext('2d');c.width=v.videoWidth;c.height=v.videoHeight;ctx.translate(c.width,0);ctx.scale(-1,1);ctx.drawImage(v,0,0);return c.toDataURL('image/jpeg',0.8);}
 
         async function loadEmployees(){try{const r=await callAPI({action:'getEmployeesWithFace'});if(r.status==='success'){allEmployees=r.data;const faceData=await firebaseGet('faceData');if(faceData){allEmployees.forEach(emp=>{if(faceData[emp.id]){emp.faceDescriptor=faceData[emp.id].descriptor;emp.hasFaceData=true;}});}employees=allEmployees.filter(e=>e.hasFaceData);filteredEmployees=[...allEmployees];renderEmpTable();populateRegSelect();}}catch(e){console.error(e);}}
