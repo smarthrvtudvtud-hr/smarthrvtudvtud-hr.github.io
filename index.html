@@ -100,8 +100,8 @@
         html.pwa-standalone .admin-header { padding-top:calc(8px + var(--safe-top)) !important; }
         html.pwa-standalone .admin-page .admin-container { padding-top:calc(40px + var(--safe-top)) !important; }
         @media (min-width:601px) {
-            html.pwa-standalone .att-container { padding-top:calc(80px + var(--safe-top)) !important; }
-            html.pwa-standalone .admin-page .admin-container { padding-top:calc(75px + var(--safe-top)) !important; }
+            html.pwa-standalone .att-container { padding-top:calc(85px + var(--safe-top)) !important; }
+            html.pwa-standalone .admin-page .admin-container { padding-top:calc(85px + var(--safe-top)) !important; }
         }
         .att-logo { display:flex; align-items:center; gap:12px; }
         .att-logo .icon { width:46px; height:46px; background:linear-gradient(135deg,var(--accent-blue-bg) 0%,var(--accent-purple-bg) 100%); border-radius:var(--radius-md); display:flex; align-items:center; justify-content:center; border:1px solid var(--border); box-shadow:var(--shadow-sm); }
@@ -764,11 +764,11 @@
     <canvas id="captureCanvas" style="display:none"></canvas>
 
     <script>
-        const API_URL='https://script.google.com/macros/s/AKfycbz8AFRV3FjB0OQ7LJqq0jRmRep_YG4Zdm-JmTLXSaPFnx-msci5YFyalv44vFofPCia/exec';
+        const API_URL='https://script.google.com/macros/s/AKfycbzarNTm0Q0LW7BlPKnXFAEd85Ga1-4Y7Cci3csaj2ecsUuBz-nqcCM8YNGUkIiq4W4U/exec';
         const FIREBASE_URL='https://employee-attendance-89b36-default-rtdb.asia-southeast1.firebasedatabase.app';
         const FACE_MATCH_THRESHOLD=0.5;
         const ITEMS_PER_PAGE=15;
-        const WORK_AREAS=[[{lat:17.3861777,lng:102.7767161},{lat:17.3871913,lng:102.7746266},{lat:17.3875573,lng:102.7748224},{lat:17.3865360,lng:102.7769172}],[{lat:17.3848262,lng:102.7795136},{lat:17.3846239,lng:102.7793580},{lat:17.3845574,lng:102.7794948},{lat:17.3847878,lng:102.7796370}]];
+        const WORK_AREAS=[[{lat:17.3861111,lng:102.7766667},{lat:17.3869444,lng:102.7744444},{lat:17.3875000,lng:102.7747222},{lat:17.3865411,lng:102.7769119}],[{lat:17.3844444,lng:102.7794444},{lat:17.3844444,lng:102.7791667},{lat:17.3850000,lng:102.7794444},{lat:17.3850000,lng:102.7797222}]];
 
         let currentUser=null,currentLocation=null,videoStream=null,employees=[],allEmployees=[];
         let matchedEmployee=null,faceDescriptor=null,isDetecting=false,detectionInterval=null,selectedShift=null;
