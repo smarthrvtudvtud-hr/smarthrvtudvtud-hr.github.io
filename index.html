@@ -796,7 +796,7 @@
     <canvas id="captureCanvas" style="display:none"></canvas>
 
     <script>
-        const API_URL='https://script.google.com/macros/s/AKfycbx-GvjjvekmPDiHDXAhwQ6aT2LUUM5Md4c3dbM4QhH-sCh4YK-SAS_ivPu5DVDmmxIg/exec';
+        const API_URL='https://script.google.com/macros/s/AKfycbwNG8COsKea0y7dlZsCoeKd_zHdP5qsZOF1N2W93WEahCp3rZEjjHL6zfhRRUEYb_N0/exec';
         const API_KEY='ATT-2024-xK9mP3nQ7vL2wR5y';
         const FIREBASE_URL='https://employee-attendance-89b36-default-rtdb.asia-southeast1.firebasedatabase.app';
         const FACE_MATCH_THRESHOLD=0.5;
@@ -852,17 +852,14 @@
         async function loadEmployees(){try{const r=await callAPI({action:'getEmployeesWithFace'});if(r.status==='success'){allEmployees=r.data;const faceData=await firebaseGet('faceData');if(faceData){allEmployees.forEach(emp=>{if(faceData[emp.id]){emp.faceDescriptor=faceData[emp.id].descriptor;emp.hasFaceData=true;}});}employees=allEmployees.filter(e=>e.hasFaceData);filteredEmployees=[...allEmployees];renderEmpTable();populateRegSelect();updateAdminLastUpdateTime();}}catch(e){console.error(e);}}
         function updateAdminLastUpdateTime(){const now=new Date();const timeStr=now.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'});const el=document.getElementById('adminLastUpdateTime');if(el)el.textContent=timeStr;}
         function showEditAttModal(rowIndex,shift,empName,empId){
-            document.getElementById('editAttRowIndex').value=rowIndex;
+            document.getElementById('editAttRowIndex').value=rowIndex||'';
             document.getElementById('editAttSearch').value='';
-            const sel=document.getElementById('editAttEmployee');
-            sel.innerHTML='<option value="">-- เลือกพนักงาน --</option>';
-            dashboardRecords.forEach(e=>{
-                const opt=document.createElement('option');
-                opt.value=e.empId+'|'+e.checkInRowIndex;
-                opt.textContent=e.empId+' - '+e.empName;
-                sel.appendChild(opt);
-            });
-            if(empId&&rowIndex){sel.value=decodeURIComponent(empId)+'|'+rowIndex;}
+            populateEditAttEmployees('');
+            // Pre-select current employee if provided
+            if(empId){
+                const sel=document.getElementById('editAttEmployee');
+                sel.value=decodeURIComponent(empId);
+            }
             const shiftSel=document.getElementById('editAttShift');
             const shiftDecoded=decodeURIComponent(shift||'');
             if(shiftDecoded==='ผลัดเช้า')shiftSel.value='morning';
@@ -871,17 +868,45 @@
             else shiftSel.value='daywork';
             document.getElementById('editAttModal').classList.add('active');lucide.createIcons();
         }
-        function filterEditAttEmployees(){
-            const search=document.getElementById('editAttSearch').value.toLowerCase().trim();
+        function populateEditAttEmployees(search){
             const sel=document.getElementById('editAttEmployee');
             sel.innerHTML='<option value="">-- เลือกพนักงาน --</option>';
-            dashboardRecords.filter(e=>{if(!search)return true;return e.empId.toLowerCase().includes(search)||e.empName.toLowerCase().includes(search);}).forEach(e=>{
-                const opt=document.createElement('option');opt.value=e.empId+'|'+e.checkInRowIndex;opt.textContent=e.empId+' - '+e.empName;sel.appendChild(opt);
+            const q=search.toLowerCase().trim();
+            allEmployees.filter(e=>{
+                if(!q)return true;
+                return e.id.toLowerCase().includes(q)||(e.fullName||e.name).toLowerCase().includes(q);
+            }).forEach(e=>{
+                const opt=document.createElement('option');
+                opt.value=e.id;
+                opt.textContent=e.id+' - '+(e.fullName||e.name);
+                sel.appendChild(opt);
             });
         }
-        function onEditAttEmployeeChange(){const sel=document.getElementById('editAttEmployee');if(sel.value){const parts=sel.value.split('|');if(parts[1])document.getElementById('editAttRowIndex').value=parts[1];}}
+        function filterEditAttEmployees(){
+            const search=document.getElementById('editAttSearch').value;
+            populateEditAttEmployees(search);
+        }
+        function onEditAttEmployeeChange(){}
         function closeEditAttModal(){document.getElementById('editAttModal').classList.remove('active');}
-        async function submitEditAtt(){const empSel=document.getElementById('editAttEmployee');if(!empSel.value){showResult('error','ไม่สำเร็จ','กรุณาเลือกพนักงาน');return;}const parts=empSel.value.split('|');const rowIndex=parts[1]||document.getElementById('editAttRowIndex').value;const newShift=document.getElementById('editAttShift').value;if(!rowIndex||!newShift){showResult('error','ไม่สำเร็จ','ข้อมูลไม่ครบถ้วน');return;}const btn=event.target;const orig=btn.innerHTML;btn.innerHTML=spinnerSVG+' บันทึก...';btn.disabled=true;try{const r=await callAPI({action:'editAttendance',rowIndex:parseInt(rowIndex),newShift:newShift,editor:currentUser?.displayName||currentUser?.username||'admin'});if(r.status==='success'){showResult('success','สำเร็จ','แก้ไขสำเร็จ\\nผลัด: '+r.data.shift+'\\nสถานะ: '+r.data.status+(r.data.lateMinutes>0?' ('+r.data.lateMinutes+' นาที)':''));closeEditAttModal();await loadDashboard();}else{showResult('error','ไม่สำเร็จ',r.message);}}catch(e){showResult('error','เกิดข้อผิดพลาด','เชื่อมต่อไม่ได้');}finally{btn.innerHTML=orig;btn.disabled=false;lucide.createIcons();}}
+        async function submitEditAtt(){
+            const empSel=document.getElementById('editAttEmployee');
+            if(!empSel.value){showResult('error','ไม่สำเร็จ','กรุณาเลือกพนักงาน');return;}
+            const rowIndex=document.getElementById('editAttRowIndex').value;
+            if(!rowIndex){showResult('error','ไม่สำเร็จ','ไม่พบข้อมูลที่จะแก้ไข');return;}
+            const newShift=document.getElementById('editAttShift').value;
+            if(!newShift){showResult('error','ไม่สำเร็จ','กรุณาเลือกผลัด');return;}
+            const btn=event.target;const orig=btn.innerHTML;btn.innerHTML=spinnerSVG+' บันทึก...';btn.disabled=true;
+            try{
+                const r=await callAPI({action:'editAttendance',rowIndex:parseInt(rowIndex),newShift:newShift,newEmployeeId:empSel.value,editor:currentUser?.displayName||currentUser?.username||'admin'});
+                if(r.status==='success'){
+                    let msg='แก้ไขสำเร็จ\nพนักงาน: '+r.data.employeeName+'\nผลัด: '+r.data.shift+'\nสถานะ: '+r.data.status;
+                    if(r.data.lateMinutes>0)msg+=' ('+r.data.lateMinutes+' นาที)';
+                    showResult('success','สำเร็จ',msg);
+                    closeEditAttModal();await loadDashboard();
+                }else{showResult('error','ไม่สำเร็จ',r.message);}
+            }catch(e){showResult('error','เกิดข้อผิดพลาด','เชื่อมต่อไม่ได้');}
+            finally{btn.innerHTML=orig;btn.disabled=false;lucide.createIcons();}
+        }
         async function loadNextId(){try{const r=await callAPI({action:'getNextEmployeeId'});if(r.status==='success')document.getElementById('newEmpId').value=r.nextId;}catch(e){}}
 
         function renderEmpTable(){const tbody=document.getElementById('employeeTableBody');const total=Math.ceil(filteredEmployees.length/ITEMS_PER_PAGE);const start=(empPage-1)*ITEMS_PER_PAGE;const pageData=filteredEmployees.slice(start,start+ITEMS_PER_PAGE);const isAdmin=currentUser&&currentUser.role==='admin';document.getElementById('thManage').style.display=isAdmin?'':'none';if(!filteredEmployees.length){tbody.innerHTML='<tr><td colspan="'+(isAdmin?6:5)+'" class="empty-state"><i data-lucide="users"></i><p>ไม่พบข้อมูล</p></td></tr>';document.getElementById('empPagination').innerHTML='';lucide.createIcons();return;}tbody.innerHTML=pageData.map(e=>{const avatarChar=getFirstNameChar(e.name,e.title);return '<tr><td><div class="emp-cell"><div class="emp-avatar">'+avatarChar+'</div><div><div class="emp-name">'+(e.fullName||e.name)+'</div><div class="emp-id">'+e.id+'</div></div></div></td><td>'+(e.position||'-')+'</td><td>'+(e.group||'-')+'</td><td><span class="badge '+(e.hasFaceData?'success':'warning')+'">'+(e.hasFaceData?'ลงทะเบียนแล้ว':'ยังไม่ลงทะเบียน')+'</span></td><td><div class="action-btns"><button class="btn btn-icon" onclick="showEmployeeStats(\''+e.id+'\',\''+(e.fullName||e.name).replace(/'/g,"\\'")+'\')"><i data-lucide="bar-chart-2"></i></button></div></td>'+(isAdmin?'<td><div class="action-btns"><button class="btn btn-icon" onclick="showEditEmployeeModal(\''+e.id+'\')"><i data-lucide="pencil"></i></button><button class="btn btn-icon" onclick="selectForReg(\''+e.id+'\')"><i data-lucide="camera"></i></button>'+(e.hasFaceData?'<button class="btn btn-icon danger" onclick="deleteFace(\''+e.id+'\')"><i data-lucide="trash-2"></i></button>':'')+'</div></td>':'')+'</tr>';}).join('');renderPagination('empPagination',total,empPage,p=>{empPage=p;renderEmpTable();});lucide.createIcons();}
