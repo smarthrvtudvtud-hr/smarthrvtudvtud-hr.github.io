@@ -101,7 +101,7 @@
         html.pwa-standalone .admin-header { padding-top:calc(8px + var(--safe-top)) !important; }
         html.pwa-standalone .admin-page .admin-container { padding-top:calc(40px + var(--safe-top)) !important; }
         @media (min-width:601px) {
-            html.pwa-standalone .att-container { padding-top:calc(85px + var(--safe-top)) !important; }
+            html.pwa-standalone .att-container { padding-top:calc(80px + var(--safe-top)) !important; }
             html.pwa-standalone .admin-page .admin-container { padding-top:calc(85px + var(--safe-top)) !important; }
         }
         .att-logo { display:flex; align-items:center; gap:12px; }
@@ -315,6 +315,20 @@
         .dropdown-item-name { font-size:0.95rem; font-weight:500; }
         .dropdown-item-id { font-size:0.8rem; color:var(--text-muted); }
         .dropdown-empty { padding:20px; text-align:center; color:var(--text-muted); }
+        
+        /* Custom Select Component */
+        .custom-select { position:relative; }
+        .custom-select-btn { display:flex; align-items:center; justify-content:space-between; width:100%; padding:12px 16px; border:1px solid var(--border); border-radius:10px; background:var(--bg-tertiary); color:var(--text-primary); font-family:'Kanit'; font-size:0.9rem; cursor:pointer; transition:all 0.3s ease; }
+        .custom-select-btn:hover { border-color:var(--accent-blue); background:var(--bg-elevated); }
+        .custom-select-btn.open { border-color:var(--accent-blue); box-shadow:var(--shadow-glow-blue); }
+        .custom-select-btn [data-lucide] { width:16px; height:16px; color:var(--text-muted); transition:transform 0.3s ease; }
+        .custom-select-btn.open [data-lucide] { transform:rotate(180deg); color:var(--accent-blue); }
+        .custom-select-dropdown { position:absolute; top:calc(100% + 4px); left:0; right:0; background:var(--bg-elevated); border:1px solid var(--border); border-radius:12px; box-shadow:0 10px 40px rgba(0,0,0,0.4); z-index:1000; display:none; overflow:hidden; }
+        .custom-select-dropdown.show { display:block; animation:selectPop 0.2s ease; }
+        @keyframes selectPop { from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)} }
+        .custom-select-option { padding:12px 16px; cursor:pointer; transition:all 0.2s ease; font-size:0.9rem; }
+        .custom-select-option:hover { background:var(--bg-tertiary); }
+        .custom-select-option.selected { background:var(--accent-blue-bg); color:var(--accent-blue); font-weight:500; }
         .dropdown-header { display:flex; align-items:center; justify-content:space-between; padding:18px 20px; border-bottom:1px solid var(--border); background:var(--bg-secondary); border-radius:16px 16px 0 0; }
         .dropdown-header h4 { margin:0; font-size:1rem; font-weight:600; color:var(--text-primary); }
         .dropdown-close { width:32px; height:32px; border:none; background:var(--bg-tertiary); border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--text-muted); transition:all 0.3s ease; }
@@ -613,15 +627,22 @@
                     <div class="form-group"><label>รหัสพนักงาน (Auto)</label><input type="text" class="form-input" id="newEmpId" disabled></div>
                     <div class="form-group">
                         <label>คำนำหน้า</label>
-                        <select class="form-select" id="newEmpTitle" onchange="handleTitleChange()">
-                            <option value="">-- เลือก --</option>
-                            <option value="นาย">นาย</option>
-                            <option value="นาง">นาง</option>
-                            <option value="นางสาว">นางสาว</option>
-                            <option value="เด็กชาย">เด็กชาย</option>
-                            <option value="เด็กหญิง">เด็กหญิง</option>
-                            <option value="อื่นๆ">อื่นๆ</option>
-                        </select>
+                        <input type="hidden" id="newEmpTitle" value="">
+                        <div class="custom-select" id="newEmpTitleSelect">
+                            <div class="custom-select-btn" onclick="toggleCustomSelect('newEmpTitleSelect')">
+                                <span id="newEmpTitleText">-- เลือก --</span>
+                                <i data-lucide="chevron-down"></i>
+                            </div>
+                            <div class="custom-select-dropdown">
+                                <div class="custom-select-option" data-value="" onclick="selectOption('newEmpTitle','','-- เลือก --')">-- เลือก --</div>
+                                <div class="custom-select-option" data-value="นาย" onclick="selectOption('newEmpTitle','นาย','นาย')">นาย</div>
+                                <div class="custom-select-option" data-value="นาง" onclick="selectOption('newEmpTitle','นาง','นาง')">นาง</div>
+                                <div class="custom-select-option" data-value="นางสาว" onclick="selectOption('newEmpTitle','นางสาว','นางสาว')">นางสาว</div>
+                                <div class="custom-select-option" data-value="เด็กชาย" onclick="selectOption('newEmpTitle','เด็กชาย','เด็กชาย')">เด็กชาย</div>
+                                <div class="custom-select-option" data-value="เด็กหญิง" onclick="selectOption('newEmpTitle','เด็กหญิง','เด็กหญิง')">เด็กหญิง</div>
+                                <div class="custom-select-option" data-value="อื่นๆ" onclick="selectOption('newEmpTitle','อื่นๆ','อื่นๆ')">อื่นๆ</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="form-group hidden" id="customTitleGroup">
@@ -722,7 +743,7 @@
             <h3 class="modal-title">แก้ไขบัญชีผู้ใช้</h3>
             <form id="editUserForm">
                 <div class="form-group"><label>ชื่อผู้ใช้</label><input type="text" class="form-input" id="editUsername" required></div>
-                <div class="form-group"><label>รหัสผ่านเดิม</label><div class="input-password-wrap"><input type="password" class="form-input" id="editOldPassword" required><button type="button" class="btn-toggle-password" onclick="togglePassword('editOldPassword',this)"><i data-lucide="eye"></i></button></div></div>
+                <div class="form-group"><label>รหัสผ่านปัจจุบัน</label><div class="input-password-wrap"><input type="password" class="form-input" id="editOldPassword" readonly><button type="button" class="btn-toggle-password" onclick="togglePassword('editOldPassword',this)"><i data-lucide="eye"></i></button></div></div>
                 <div class="form-group"><label>รหัสผ่านใหม่ (เว้นว่างถ้าไม่เปลี่ยน)</label><div class="input-password-wrap"><input type="password" class="form-input" id="editNewPassword"><button type="button" class="btn-toggle-password" onclick="togglePassword('editNewPassword',this)"><i data-lucide="eye"></i></button></div></div>
                 <div class="form-group"><label>ชื่อที่แสดง</label><input type="text" class="form-input" id="editDisplayName" required></div>
                 <button type="submit" class="btn btn-primary" style="width:100%"><i data-lucide="save"></i>บันทึก</button>
@@ -1059,7 +1080,7 @@
             if(!currentUser)return;
             document.getElementById('editUsername').value=currentUser.username||'';
             document.getElementById('editDisplayName').value=currentUser.name||'';
-            document.getElementById('editOldPassword').value='';
+            document.getElementById('editOldPassword').value=currentUser.password||'';
             document.getElementById('editNewPassword').value='';
             document.getElementById('editUserModal').classList.add('active');
             closeSidebar();
