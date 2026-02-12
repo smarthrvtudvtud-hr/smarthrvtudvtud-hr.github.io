@@ -1,6 +1,6 @@
 {
-    "name": "Face Attendance",
-    "short_name": "Face Attendance",
+    "name": "Face Attendance Lite",
+    "short_name": "Face Attendance Lite",
     "description": "ระบบลงเวลาทำงานด้วยการจดจำใบหน้า",
     "start_url": "./index.html",
     "display": "standalone",
